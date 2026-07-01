@@ -1,0 +1,96 @@
+import type { TableModel } from '../types/poker';
+
+// A static mid-hand snapshot used to lay out the shell. It deliberately shows
+// every seat state at once: hero to act, an opponent who bet, an all-in, two
+// folds, the dealer button + blinds, and one open seat.
+export const SAMPLE_TABLE: TableModel = {
+  street: 'flop',
+  pot: 1250,
+  board: ['AH', '9C', '2D', null, null],
+  heroOptions: {
+    canCheck: false,
+    toCall: 300,
+    minRaise: 600,
+    maxRaise: 4820,
+    pot: 1250,
+  },
+  seats: [
+    {
+      seatIndex: 0,
+      name: 'You',
+      stack: 4820,
+      holeCards: ['AS', 'KH'],
+      holeFaceUp: true,
+      status: 'active',
+      isHero: true,
+      isToAct: true,
+      timer: 0.62,
+    },
+    {
+      seatIndex: 1,
+      name: 'Marina',
+      stack: 3120,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'active',
+      bet: 300,
+      lastAction: 'Bet 300',
+    },
+    {
+      seatIndex: 2,
+      name: 'Diego',
+      stack: 0,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'allin',
+      bet: 1500,
+      lastAction: 'All-in',
+    },
+    {
+      seatIndex: 3,
+      name: 'Yuki',
+      stack: 2540,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'folded',
+      lastAction: 'Fold',
+    },
+    {
+      seatIndex: 4,
+      name: 'Sven',
+      stack: 5400,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'active',
+      isDealer: true,
+    },
+    {
+      seatIndex: 5,
+      name: 'Aisha',
+      stack: 2210,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'active',
+      blind: 'SB',
+    },
+    {
+      seatIndex: 6,
+      name: 'Leo',
+      stack: 7015,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'active',
+      blind: 'BB',
+    },
+    {
+      seatIndex: 7,
+      name: 'Priya',
+      stack: 980,
+      holeCards: [null, null],
+      holeFaceUp: false,
+      status: 'folded',
+      lastAction: 'Fold',
+    },
+    null, // seat 8 — open
+  ],
+};
