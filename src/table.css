@@ -180,15 +180,19 @@
 .board-slot {
   width: var(--board-card-w);
   height: calc(var(--board-card-w) * 1.4);
-  border-radius: 5px;
+  border-radius: 0;
   display: grid;
   place-items: center;
 }
 
+/* Pixel-dashed outline: four hard dash strips, one per edge. */
 .board-slot.is-empty {
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.18);
-  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.3);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 var(--px2), transparent var(--px2) calc(var(--px2) * 2)) top / 100% var(--px) no-repeat,
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 var(--px2), transparent var(--px2) calc(var(--px2) * 2)) bottom / 100% var(--px) no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.16) 0 var(--px2), transparent var(--px2) calc(var(--px2) * 2)) left / var(--px) 100% no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.16) 0 var(--px2), transparent var(--px2) calc(var(--px2) * 2)) right / var(--px) 100% no-repeat,
+    rgba(0, 0, 0, 0.22);
 }
 
 .board-slot-label {
@@ -207,7 +211,7 @@
   pointer-events: none;
   user-select: none;
   image-rendering: pixelated;
-  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 var(--px2) 0 rgba(0, 0, 0, 0.4));
 }
 
 /* ---------- Pot ---------- */
@@ -217,17 +221,18 @@
   align-items: center;
   gap: 8px;
   padding: 5px 12px 5px 10px;
-  background: rgba(4, 10, 8, 0.7);
-  border: 1px solid var(--plate-line);
-  border-radius: 999px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  border: var(--px2) solid transparent;
+  border-image: var(--frame-gold) 2;
+  background: rgba(6, 12, 9, 0.88) padding-box;
+  border-radius: 0;
+  box-shadow: 0 var(--px2) 0 var(--shadow);
 }
 
 .pot-label {
   font-family: var(--font-pixel);
   font-size: 0.5rem;
   letter-spacing: 0;
-  color: var(--gold);
+  color: var(--gold-1);
 }
 
 .pot-side {
@@ -235,23 +240,24 @@
   gap: 6px;
   font-size: 0.62rem;
   color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Chips ---------- */
 
+/* Flat pixel disc: rim dashes (hard conic), flat center, hard outline. */
 .chip {
   display: block;
   width: var(--chip-size, 22px);
   height: var(--chip-size, 22px);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.28), transparent 42%),
-    var(--chip-color, #c0392b);
+    radial-gradient(circle, var(--chip-color, #c0392b) 0 58%, transparent 58% 100%),
+    repeating-conic-gradient(#f6efdc 0 24deg, var(--chip-ring, #7e2118) 24deg 60deg);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.5),
-    inset 0 0 0 4px var(--chip-ring, #7e2118),
-    0 2px 3px rgba(0, 0, 0, 0.5);
-  image-rendering: auto;
+    0 0 0 var(--px) var(--outline),
+    inset 0 calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.28);
+  image-rendering: pixelated;
 }
 
 .chip-stack {
@@ -276,7 +282,8 @@
   font-size: 0.74rem;
   font-weight: 800;
   color: var(--ink);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 #000;
 }
 
 /* ---------- Seats ---------- */
@@ -377,24 +384,24 @@
   font-family: var(--font-pixel);
   font-size: 0.44rem;
   letter-spacing: 0;
-  border-radius: 5px;
+  border: var(--px) solid var(--outline);
+  border-radius: 0;
   z-index: var(--z-badge);
 }
 
 .badge-dealer {
-  color: #1a1206;
-  background: linear-gradient(180deg, #fff6dd, #e7c270);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  color: var(--outline);
+  background: #f6efdc;
+  box-shadow: 0 var(--px) 0 var(--shadow);
 }
 
 .badge-blind {
   color: var(--ink);
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--plate-line);
+  background: var(--plate);
 }
 
 .blind-BB {
-  color: var(--gold);
+  color: var(--gold-1);
 }
 
 /* Action timer: pulsing outline + bottom progress bar */
