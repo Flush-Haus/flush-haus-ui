@@ -1,8 +1,23 @@
 import { useEffect, useRef } from 'react';
 import PokerTable from './components/table/PokerTable';
 import Lobby from './components/table/Lobby';
+import type { ActionBarActions } from './components/table/ActionBar';
+import { SAMPLE_TABLE } from './data/sampleTable';
 import { usePokerTable } from './net/usePokerTable';
 import './table.css';
+
+// ?demo renders the static sample table (every seat state at once) so the
+// full layout can be inspected without a server or a second player.
+const DEMO = new URLSearchParams(window.location.search).has('demo');
+const noop = () => undefined;
+const demoActions: ActionBarActions = {
+  fold: noop,
+  check: noop,
+  call: noop,
+  bet: noop,
+  raise: noop,
+  allIn: noop,
+};
 
 // Card sandbox preserved in ./CardSandbox for reference; its FlyingCard/DeckStack
 // motion primitives are the next layer to graft onto these live state transitions.
@@ -23,6 +38,10 @@ export default function App() {
   }, [net.sessionState, isOwner, actions]);
 
   const showNextHand = net.sessionState === 'running' && !net.handInProgress && isOwner;
+
+  if (DEMO) {
+    return <PokerTable table={SAMPLE_TABLE} actions={demoActions} banner="FLUSH HAUS" />;
+  }
 
   return (
     <>

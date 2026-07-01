@@ -3,7 +3,8 @@ import type { TableModel } from '../types/poker';
 import { PokerClient, type ClientStatus } from './PokerClient';
 import { initialNetState, pokerReducer, selectTableModel, type NetState } from './pokerReducer';
 
-export const DEFAULT_WS_URL = 'ws://localhost:3000/ws';
+// flush-haus-api defaults to PORT=8080 (src/utils/env.ts).
+export const DEFAULT_WS_URL = 'ws://localhost:8080/ws';
 
 export interface PokerActions {
   connect: (url?: string) => void;
