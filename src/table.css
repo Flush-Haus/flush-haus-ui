@@ -91,11 +91,16 @@
   width: min(1180px, 94vw);
   height: min(640px, 76vh);
   border-radius: clamp(150px, 26vw, 340px);
-  background: linear-gradient(180deg, var(--rail-edge), var(--rail-base) 22%, var(--rail-lip));
+  background: linear-gradient(
+    180deg,
+    var(--wood-1) 0 12%,
+    var(--wood-2) 12% 55%,
+    var(--wood-2b) 55% 78%,
+    var(--wood-3) 78% 100%
+  );
   box-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.06),
-    0 28px 60px rgba(0, 0, 0, 0.7),
-    inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+    0 0 0 var(--px) var(--outline),
+    0 var(--px3) 0 rgba(0, 0, 0, 0.65);
   z-index: var(--z-felt);
 }
 
@@ -104,26 +109,29 @@
   inset: clamp(14px, 1.7vw, 24px);
   border-radius: inherit;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 42%, var(--felt-center), var(--felt-mid) 52%, var(--felt-edge) 100%);
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    var(--felt-1) 0 32%,
+    var(--felt-2) 32% 60%,
+    var(--felt-3) 60% 100%
+  );
   box-shadow:
-    inset 0 0 0 3px rgba(8, 22, 15, 0.9),
-    inset 0 0 60px rgba(0, 0, 0, 0.55),
-    inset 0 6px 26px rgba(0, 0, 0, 0.45);
+    inset 0 0 0 var(--px) var(--outline),
+    inset 0 0 0 var(--px3) var(--felt-line);
 }
 
-/* Ordered-dither texture: a hard 2px checker, very low contrast. */
+/* Ordered-dither texture: hard checker sized in art pixels. */
 .felt-dither {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.4;
   mix-blend-mode: soft-light;
   background-image: repeating-conic-gradient(
     rgba(255, 255, 255, 0.05) 0% 25%,
     rgba(0, 0, 0, 0.06) 0% 50%
   );
-  background-size: 4px 4px;
+  background-size: var(--px2) var(--px2);
   image-rendering: pixelated;
 }
 
@@ -131,7 +139,11 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 40%, var(--gold-soft), transparent 46%);
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(245, 205, 118, 0.09) 0 32%,
+    transparent 32%
+  );
 }
 
 .felt-mark {
@@ -141,7 +153,7 @@
   transform: translate(-50%, -50%);
   font-size: clamp(120px, 20vw, 240px);
   line-height: 1;
-  color: rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.05);
   pointer-events: none;
   user-select: none;
 }
@@ -609,14 +621,14 @@
   background:
     repeating-linear-gradient(
       0deg,
-      rgba(0, 0, 0, 0.16) 0px,
-      rgba(0, 0, 0, 0.16) 1px,
+      rgba(0, 0, 0, 0.14) 0px,
+      rgba(0, 0, 0, 0.14) 1px,
       transparent 1px,
-      transparent 3px
+      transparent 4px
     ),
     radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.5) 100%);
   mix-blend-mode: multiply;
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 /* ---------- Motion ---------- */
