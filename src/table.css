@@ -4,7 +4,9 @@
    shadows, steps() motion. No blur, no smooth gradients, no border-radius
    (exceptions: the table oval geometry, chip/avatar discs). */
 
-.poker-room {
+/* Tokens live on :root because the lobby overlay and HUD render outside
+   .poker-room but share the same pixel language. */
+:root {
   /* one art pixel */
   --px: 2px;
   --px2: calc(var(--px) * 2);
@@ -72,7 +74,9 @@
   --z-badge: 12;
   --z-action: 30;
   --z-crt: 50;
+}
 
+.poker-room {
   position: relative;
   display: grid;
   place-items: center;
@@ -734,12 +738,14 @@
 .table-banner {
   font-family: var(--font-pixel);
   font-size: 0.56rem;
-  line-height: 1.5;
-  color: #1a1206;
-  background: linear-gradient(180deg, #ffe08a, #e8b446);
+  line-height: 1.6;
+  color: var(--gold-ink);
+  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%) padding-box;
+  border: var(--px2) solid transparent;
+  border-image: var(--frame-gold) 2;
   padding: 8px 14px;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  border-radius: 0;
+  box-shadow: 0 var(--px2) 0 var(--shadow);
   text-align: center;
   max-width: 60vw;
 }
@@ -756,26 +762,28 @@
   padding: 6px 10px;
   font-size: 0.78rem;
   color: var(--ink);
-  background: rgba(6, 12, 9, 0.82);
-  border: 1px solid var(--plate-line);
-  border-radius: 10px;
+  border: var(--px2) solid transparent;
+  border-image: var(--frame-plate) 2;
+  background: rgba(6, 12, 9, 0.92) padding-box;
+  border-radius: 0;
   z-index: var(--z-action);
 }
 
 .hud-dot {
   width: 9px;
   height: 9px;
-  border-radius: 50%;
+  border-radius: 0;
   background: #666;
+  border: 1px solid var(--outline);
 }
 
 .hud-dot.status-connected {
   background: #4fd08a;
-  box-shadow: 0 0 8px #4fd08a;
+  box-shadow: none;
 }
 
 .hud-dot.status-connecting {
-  background: #e0a82e;
+  background: var(--gold-2);
 }
 
 .hud-dot.status-error {
@@ -785,23 +793,30 @@
 .hud-text {
   font-weight: 700;
   letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-btn {
-  padding: 4px 10px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #0a0a0a;
-  background: linear-gradient(180deg, #ffe08a, #e8b446);
-  border: 0;
-  border-radius: 7px;
+  padding: 6px 10px;
+  font-family: var(--font-pixel);
+  font-size: 0.46rem;
+  color: var(--gold-ink);
+  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%);
+  border: var(--px) solid var(--outline);
+  border-radius: 0;
+  box-shadow: 0 var(--px) 0 var(--outline);
   cursor: pointer;
+}
+
+.hud-btn:active {
+  transform: translateY(var(--px));
+  box-shadow: none;
 }
 
 .hud-btn-ghost {
   color: var(--ink-muted);
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: var(--px) solid var(--plate-line);
 }
 
 /* ---------- Lobby ---------- */
@@ -820,10 +835,11 @@
   width: min(420px, 94vw);
   padding: 22px;
   color: var(--ink);
-  background: linear-gradient(180deg, rgba(16, 26, 21, 0.98), rgba(6, 12, 9, 0.99));
-  border: 1px solid var(--plate-line);
-  border-radius: 16px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  border: var(--px3) solid transparent;
+  border-image: var(--frame-plate) 2;
+  background: #0b120e padding-box;
+  border-radius: 0;
+  box-shadow: 0 var(--px3) 0 rgba(0, 0, 0, 0.7);
 }
 
 .lobby-head {
@@ -859,9 +875,9 @@
   padding: 6px 10px;
   font-size: 0.74rem;
   color: #ffb3ab;
-  background: rgba(180, 60, 50, 0.18);
-  border: 1px solid rgba(220, 90, 80, 0.4);
-  border-radius: 8px;
+  background: rgba(120, 40, 34, 0.4);
+  border: var(--px) solid #a04338;
+  border-radius: 0;
 }
 
 .lobby-step {
@@ -883,35 +899,42 @@
   font: inherit;
   font-size: 0.9rem;
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: var(--px) solid var(--plate-line);
+  border-radius: 0;
 }
 
 .lobby-field input:focus {
   outline: none;
-  border-color: var(--gold);
+  border-color: var(--gold-1);
 }
 
 .lobby-primary,
 .lobby-secondary {
-  padding: 11px;
-  font-weight: 800;
-  border-radius: 9px;
+  padding: 12px;
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  border-radius: 0;
   cursor: pointer;
+  box-shadow: 0 var(--px) 0 var(--outline);
 }
 
 .lobby-primary {
-  color: #0a0a0a;
-  background: linear-gradient(180deg, #ffe08a, #e8b446);
-  border: 0;
+  color: var(--gold-ink);
+  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%);
+  border: var(--px) solid var(--outline);
+}
+
+.lobby-primary:active,
+.lobby-secondary:active {
+  transform: translateY(var(--px));
+  box-shadow: none;
 }
 
 .lobby-secondary {
   color: var(--ink);
-  font-weight: 700;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--plate-line);
+  border: var(--px) solid var(--plate-line);
 }
 
 .lobby-primary:disabled,
@@ -960,15 +983,18 @@
   padding: 7px 10px;
   font-size: 0.84rem;
   background: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
 }
 
 .lobby-tag {
-  padding: 1px 6px;
-  font-size: 0.6rem;
-  color: var(--gold);
-  background: rgba(245, 205, 118, 0.16);
-  border-radius: 999px;
+  padding: 2px 6px;
+  font-family: var(--font-pixel);
+  font-size: 0.42rem;
+  color: var(--gold-1);
+  background: rgba(245, 205, 118, 0.14);
+  border: 1px solid var(--gold-2);
+  border-radius: 0;
 }
 
 .lobby-blinds {
