@@ -1,21 +1,63 @@
-/* Pixel-art / retro 9-max poker table.
-   Built to sit on the existing black stage and reuse the warm-gold accent from
-   the card sandbox. Everything renders crisp ("pixelated") to match the cards. */
+/* Flush Haus — pixel-art 9-max poker table.
+   Matches the card sprites: flat banded color (hard-stop gradients only),
+   pixel border frames (6×6 SVG border-image, stepped corners), hard offset
+   shadows, steps() motion. No blur, no smooth gradients, no border-radius
+   (exceptions: the table oval geometry, chip/avatar discs). */
 
 .poker-room {
-  --felt-center: #15643f;
-  --felt-mid: #0c4a2e;
-  --felt-edge: #062a1a;
-  --rail-base: #241712;
-  --rail-edge: #4a3322;
-  --rail-lip: #050d0a;
-  --gold: #f5cd76;
-  --gold-soft: rgba(245, 205, 118, 0.16);
-  --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+  /* one art pixel */
+  --px: 2px;
+  --px2: calc(var(--px) * 2);
+  --px3: calc(var(--px) * 3);
+
+  /* palette bands */
+  --felt-1: #1c7a4c;
+  --felt-2: #135939;
+  --felt-3: #0a3a25;
+  --felt-line: #051f14;
+  --wood-1: #6b4527;
+  --wood-2: #462c19;
+  --wood-2b: #331e10;
+  --wood-3: #24140b;
+  --gold-1: #f5cd76;
+  --gold-2: #e0a83a;
+  --gold-ink: #1a1206;
+  --outline: #070b08;
   --ink: #f4ecd8;
   --ink-muted: rgba(244, 236, 216, 0.62);
-  --plate: #0c1411;
-  --plate-line: rgba(245, 205, 118, 0.22);
+  --plate: #0d1611;
+  --plate-line: #57492a;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+
+  /* 6×6 pixel frames, border-image-slice 2: dark outer line + light inner
+     line with 1-step corners. Pair with:
+       border: var(--px2) solid transparent;
+       border-image: var(--frame-plate) 2;
+       background: <fill> padding-box;  */
+  --frame-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%2357492a' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%23070b08' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
+  --frame-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23f5cd76' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%23070b08' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
+
+  /* single-step pixel corner for flat, unframed elements */
+  --clip-step: polygon(
+    0 var(--px2), var(--px2) var(--px2), var(--px2) 0,
+    calc(100% - var(--px2)) 0, calc(100% - var(--px2)) var(--px2), 100% var(--px2),
+    100% calc(100% - var(--px2)),
+    calc(100% - var(--px2)) calc(100% - var(--px2)),
+    calc(100% - var(--px2)) 100%, var(--px2) 100%,
+    var(--px2) calc(100% - var(--px2)), 0 calc(100% - var(--px2))
+  );
+
+  /* legacy aliases — every rule below migrates off these by the final pass,
+     then this block is deleted */
+  --felt-center: var(--felt-1);
+  --felt-mid: var(--felt-2);
+  --felt-edge: var(--felt-3);
+  --rail-base: var(--wood-2);
+  --rail-edge: var(--wood-1);
+  --rail-lip: var(--wood-3);
+  --gold: var(--gold-1);
+  --gold-soft: rgba(245, 205, 118, 0.16);
 
   --avatar-size: clamp(34px, 3.6vw, 46px);
   --hole-card-w: clamp(30px, 3.1vw, 46px);
@@ -37,10 +79,7 @@
   width: 100vw;
   min-height: 100vh;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 30%, rgba(40, 70, 55, 0.22), transparent 46%),
-    radial-gradient(ellipse at 50% 80%, rgba(15, 30, 24, 0.4), transparent 52%),
-    #040907;
+  background: radial-gradient(ellipse at 50% 45%, #0a1410 0 34%, #071009 34% 62%, #050a07 62% 100%);
   isolation: isolate;
   image-rendering: pixelated;
 }
