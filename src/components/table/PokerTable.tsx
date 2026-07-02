@@ -1,11 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import useCardAssets from '../../hooks/useCardAssets';
 import type { TableModel } from '../../types/poker';
+import FlyingCard from '../FlyingCard';
 import { SEAT_ANCHORS } from './seatLayout';
 import Seat from './Seat';
 import CommunityBoard from './CommunityBoard';
 import Pot from './Pot';
 import ActionBar, { type ActionBarActions } from './ActionBar';
+import useDealFX from './useDealFX';
 
 interface PokerTableProps {
   table: TableModel;
@@ -15,14 +17,17 @@ interface PokerTableProps {
 
 export default function PokerTable({ table, actions, banner }: PokerTableProps) {
   const { cards, backCard } = useCardAssets();
+  const roomRef = useRef<HTMLElement>(null);
 
   const getCardUrl = useMemo(() => {
     const map = new Map(cards.map((card) => [card.id, card.url]));
     return (id?: string | null) => (id ? map.get(id) : undefined);
   }, [cards]);
 
+  const { flights, hiddenCards, completeFlight } = useDealFX(table, roomRef, getCardUrl, backCard?.url);
+
   return (
-    <main className="poker-room" aria-label="Mesa de poker">
+    <main className="poker-room" aria-label="Mesa de poker" ref={roomRef}>
       <div className="table-rail">
         <div className="felt">
           <div className="felt-dither" aria-hidden="true" />
@@ -34,8 +39,14 @@ export default function PokerTable({ table, actions, banner }: PokerTableProps) 
           <div className="table-center">
             {banner ? <div className="table-banner">{banner}</div> : null}
             <Pot pot={table.pot} sidePots={table.sidePots} />
-            <CommunityBoard board={table.board} getCardUrl={getCardUrl} />
+            <CommunityBoard board={table.board} getCardUrl={getCardUrl} hiddenCards={hiddenCards} />
           </div>
+
+          {backCard ? (
+            <div className="table-deck" aria-hidden="true">
+              <img src={backCard.url} alt="" draggable="false" />
+            </div>
+          ) : null}
         </div>
 
         {SEAT_ANCHORS.map((anchor, index) => (
@@ -45,6 +56,18 @@ export default function PokerTable({ table, actions, banner }: PokerTableProps) 
             seat={table.seats[index] ?? null}
             getCardUrl={getCardUrl}
             backUrl={backCard?.url}
+            hiddenCards={hiddenCards}
+          />
+        ))}
+      </div>
+
+      <div className="table-fx" aria-hidden="true">
+        {flights.map((flight) => (
+          <FlyingCard
+            key={flight.animationId}
+            flyingCard={flight}
+            backUrl={backCard?.url}
+            onComplete={() => completeFlight(flight)}
           />
         ))}
       </div>

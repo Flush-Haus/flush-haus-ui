@@ -9,6 +9,7 @@ interface SeatProps {
   seat: SeatModel | null;
   getCardUrl: (id?: string | null) => string | undefined;
   backUrl?: string;
+  hiddenCards?: Set<string>;
 }
 
 function initials(name: string) {
@@ -28,7 +29,7 @@ function avatarHue(name: string) {
   return hash;
 }
 
-function HoleCards({ seat, getCardUrl, backUrl }: Omit<SeatProps, 'anchor'> & { seat: SeatModel }) {
+function HoleCards({ seat, getCardUrl, backUrl, hiddenCards }: Omit<SeatProps, 'anchor'> & { seat: SeatModel }) {
   if (seat.status === 'folded') {
     return null;
   }
@@ -36,14 +37,23 @@ function HoleCards({ seat, getCardUrl, backUrl }: Omit<SeatProps, 'anchor'> & { 
   const cards = seat.holeCards.length ? seat.holeCards : [null, null];
 
   return (
-    <div className={`seat-hole ${seat.isHero ? 'is-hero' : ''}`}>
+    <div className={`seat-hole ${seat.isHero ? 'is-hero' : ''}`} data-seat={seat.seatIndex}>
       {cards.map((cardId, index) => {
         const faceUrl = seat.holeFaceUp ? getCardUrl(cardId) : undefined;
         const url = faceUrl ?? backUrl;
         const tilt = (index - (cards.length - 1) / 2) * (seat.isHero ? 7 : 5);
+        const hidden = hiddenCards?.has(`hole-${seat.seatIndex}-${index}`);
         return (
           <span className="hole-card" key={index} style={{ '--tilt': `${tilt}deg` } as CSSProperties}>
-            {url ? <img className="tbl-card" src={url} alt="" draggable="false" /> : null}
+            {url ? (
+              <img
+                className="tbl-card"
+                src={url}
+                alt=""
+                draggable="false"
+                style={hidden ? { visibility: 'hidden' } : undefined}
+              />
+            ) : null}
           </span>
         );
       })}
@@ -51,7 +61,7 @@ function HoleCards({ seat, getCardUrl, backUrl }: Omit<SeatProps, 'anchor'> & { 
   );
 }
 
-export default function Seat({ anchor, seat, getCardUrl, backUrl }: SeatProps) {
+export default function Seat({ anchor, seat, getCardUrl, backUrl, hiddenCards }: SeatProps) {
   const positionStyle = {
     left: `${anchor.x}%`,
     top: `${anchor.y}%`,
@@ -111,7 +121,7 @@ export default function Seat({ anchor, seat, getCardUrl, backUrl }: SeatProps) {
 
       {/* Center side — hole cards + bet, pushed toward the pot */}
       <div className="seat-center">
-        <HoleCards seat={seat} getCardUrl={getCardUrl} backUrl={backUrl} />
+        <HoleCards seat={seat} getCardUrl={getCardUrl} backUrl={backUrl} hiddenCards={hiddenCards} />
         {typeof seat.bet === 'number' && seat.bet > 0 ? (
           <div className="seat-bet">
             <ChipStack amount={seat.bet} size={16} />

@@ -18,6 +18,8 @@ interface FlyingCardState {
   rotation: number;
   spin: number;
   zIndex: number;
+  /** Optional stagger: the card waits invisible at the origin, then flies. */
+  delay?: number;
 }
 
 interface FlyingCardProps {
@@ -34,6 +36,7 @@ export default function FlyingCard({ flyingCard, backUrl, onComplete }: FlyingCa
   const midX = flyingCard.from.x + (flyingCard.to.x - flyingCard.from.x) * 0.5;
   const midY = Math.min(flyingCard.from.y, flyingCard.to.y) - 42;
   const duration = isDraw ? 0.84 : 0.62;
+  const delay = flyingCard.delay ?? 0;
 
   return (
     <motion.div
@@ -48,7 +51,7 @@ export default function FlyingCard({ flyingCard, backUrl, onComplete }: FlyingCa
         y: flyingCard.from.y,
         rotateZ: flyingCard.fromRotation,
         scale: flyingCard.from.width / flyingCard.to.width,
-        opacity: 1,
+        opacity: delay > 0 ? 0 : 1,
       }}
       animate={{
         x: isDraw ? flyingCard.to.x : [flyingCard.from.x, midX, flyingCard.to.x],
@@ -61,9 +64,11 @@ export default function FlyingCard({ flyingCard, backUrl, onComplete }: FlyingCa
       }}
       transition={{
         duration,
+        delay,
         type: 'tween',
         ease: isDraw ? drawEase : premiumEase,
         times: isDraw ? undefined : [0, 0.54, 1],
+        opacity: { duration: 0.01, delay },
       }}
       onAnimationComplete={() => onComplete(flyingCard)}
     >
@@ -76,6 +81,7 @@ export default function FlyingCard({ flyingCard, backUrl, onComplete }: FlyingCa
         }}
         transition={{
           duration: isDraw ? 0.78 : duration,
+          delay,
           type: 'tween',
           ease: isDraw ? drawEase : premiumEase,
           times: isDraw ? undefined : [0, 0.5, 1],

@@ -654,6 +654,46 @@
   background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%) padding-box;
 }
 
+/* ---------- Deal FX ---------- */
+
+/* Overlay for cards in flight; coordinates are room-relative. */
+.table-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+/* Override the sandbox look: hard pixel shadow, square corners. */
+.table-fx .flying-card {
+  border-radius: 0;
+  filter: drop-shadow(0 var(--px2) 0 rgba(0, 0, 0, 0.45));
+}
+
+.table-fx .flying-card-face {
+  border-radius: 0;
+}
+
+/* The dealer's shoe: a small stack of backs on the felt. */
+.table-deck {
+  position: absolute;
+  left: 38%;
+  top: 24%;
+  width: calc(var(--board-card-w) * 0.62);
+  transform: rotate(4deg);
+  z-index: var(--z-board);
+  pointer-events: none;
+}
+
+.table-deck img {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+  filter:
+    drop-shadow(calc(var(--px) * -1) var(--px) 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(calc(var(--px) * -2) calc(var(--px) * 2) 0 rgba(0, 0, 0, 0.35));
+}
+
 /* ---------- CRT overlay ---------- */
 
 .crt-overlay {
