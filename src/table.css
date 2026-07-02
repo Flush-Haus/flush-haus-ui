@@ -7,28 +7,28 @@
 /* Tokens live on :root because the lobby overlay and HUD render outside
    .poker-room but share the same pixel language. */
 :root {
-  /* one art pixel */
-  --px: 2px;
+  /* one art pixel — chunky on desktop, tightened on small screens */
+  --px: 3px;
   --px2: calc(var(--px) * 2);
   --px3: calc(var(--px) * 3);
 
-  /* palette bands */
-  --felt-1: #1c7a4c;
-  --felt-2: #135939;
-  --felt-3: #0a3a25;
-  --felt-line: #051f14;
-  --wood-1: #6b4527;
-  --wood-2: #462c19;
-  --wood-2b: #331e10;
-  --wood-3: #24140b;
-  --gold-1: #f5cd76;
-  --gold-2: #e0a83a;
+  /* 1900s riverboat saloon: mahogany, brass, ivory, emerald baize */
+  --felt-1: #2e9663;
+  --felt-2: #1e7047;
+  --felt-3: #124a2f;
+  --felt-line: #06281a;
+  --wood-1: #9a5232;
+  --wood-2: #6e3520;
+  --wood-2b: #522414;
+  --wood-3: #34140b;
+  --gold-1: #e6b54c;
+  --gold-2: #c08a2e;
   --gold-ink: #1a1206;
-  --outline: #070b08;
-  --ink: #f4ecd8;
-  --ink-muted: rgba(244, 236, 216, 0.62);
-  --plate: #0d1611;
-  --plate-line: #57492a;
+  --outline: #0a0705;
+  --ink: #f6eed9;
+  --ink-muted: rgba(246, 238, 217, 0.66);
+  --plate: #161009;
+  --plate-line: #6b5426;
   --shadow: rgba(0, 0, 0, 0.55);
   --font-pixel: 'Press Start 2P', ui-monospace, monospace;
 
@@ -37,8 +37,8 @@
        border: var(--px2) solid transparent;
        border-image: var(--frame-plate) 2;
        background: <fill> padding-box;  */
-  --frame-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%2357492a' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%23070b08' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
-  --frame-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23f5cd76' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%23070b08' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
+  --frame-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%236b5426' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%230a0705' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
+  --frame-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e6b54c' d='M2 1h2v1H2zM2 4h2v1H2zM1 2h1v2H1zM4 2h1v2H4z'/%3E%3Cpath fill='%230a0705' d='M2 0h2v1H2zM2 5h2v1H2zM0 2h1v2H0zM5 2h1v2H5zM1 1h1v1H1zM4 1h1v1H4zM1 4h1v1H1zM4 4h1v1H4z'/%3E%3C/svg%3E");
 
   /* single-step pixel corner for flat, unframed elements */
   --clip-step: polygon(
@@ -72,24 +72,27 @@
   width: 100vw;
   min-height: 100vh;
   overflow: hidden;
-  background: radial-gradient(ellipse at 50% 45%, #0a1410 0 34%, #071009 34% 62%, #050a07 62% 100%);
+  background: radial-gradient(ellipse at 50% 45%, #191009 0 34%, #100a06 34% 62%, #090503 62% 100%);
   isolation: isolate;
   image-rendering: pixelated;
 }
 
 /* ---------- Table + rail ---------- */
 
+/* Oval keeps a fixed aspect so short/wide windows don't squash it:
+   width is capped by viewport width AND by height-derived width. */
 .table-rail {
   position: relative;
-  width: min(1180px, 94vw);
-  height: min(640px, 76vh);
+  width: min(1180px, 94vw, calc((100vh - 130px) * 1.8));
+  aspect-ratio: 1.8 / 1;
   border-radius: clamp(150px, 26vw, 340px);
   background: linear-gradient(
     180deg,
-    var(--wood-1) 0 12%,
-    var(--wood-2) 12% 55%,
-    var(--wood-2b) 55% 78%,
-    var(--wood-3) 78% 100%
+    var(--wood-1) 0 10%,
+    var(--wood-2) 10% 46%,
+    var(--wood-2b) 46% 52%,
+    var(--wood-2) 52% 74%,
+    var(--wood-3) 74% 100%
   );
   box-shadow:
     0 0 0 var(--px) var(--outline),
@@ -97,9 +100,10 @@
   z-index: var(--z-felt);
 }
 
+/* Brass inlay ring sits on the mahogany, just outside the felt. */
 .felt {
   position: absolute;
-  inset: clamp(14px, 1.7vw, 24px);
+  inset: clamp(16px, 1.9vw, 28px);
   border-radius: inherit;
   overflow: hidden;
   background: radial-gradient(
@@ -109,6 +113,8 @@
     var(--felt-3) 60% 100%
   );
   box-shadow:
+    0 0 0 var(--px) var(--gold-2),
+    0 0 0 calc(var(--px) * 2) rgba(10, 7, 5, 0.8),
     inset 0 0 0 var(--px) var(--outline),
     inset 0 0 0 var(--px3) var(--felt-line);
 }
@@ -118,11 +124,11 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.6;
   mix-blend-mode: soft-light;
   background-image: repeating-conic-gradient(
-    rgba(255, 255, 255, 0.05) 0% 25%,
-    rgba(0, 0, 0, 0.06) 0% 50%
+    rgba(255, 255, 255, 0.09) 0% 25%,
+    rgba(0, 0, 0, 0.11) 0% 50%
   );
   background-size: var(--px2) var(--px2);
   image-rendering: pixelated;
@@ -134,7 +140,7 @@
   pointer-events: none;
   background: radial-gradient(
     ellipse at 50% 40%,
-    rgba(245, 205, 118, 0.09) 0 32%,
+    rgba(230, 181, 76, 0.1) 0 32%,
     transparent 32%
   );
 }
@@ -216,7 +222,7 @@
   padding: 5px 12px 5px 10px;
   border: var(--px2) solid transparent;
   border-image: var(--frame-gold) 2;
-  background: rgba(6, 12, 9, 0.88) padding-box;
+  background: rgba(12, 8, 5, 0.88) padding-box;
   border-radius: 0;
   box-shadow: 0 var(--px2) 0 var(--shadow);
 }
@@ -505,7 +511,7 @@
   padding: 12px 14px;
   border: var(--px2) solid transparent;
   border-image: var(--frame-plate) 2;
-  background: rgba(10, 16, 12, 0.95) padding-box;
+  background: rgba(16, 11, 6, 0.95) padding-box;
   border-radius: 0;
   box-shadow: 0 var(--px3) 0 var(--shadow);
   z-index: var(--z-action);
@@ -543,7 +549,7 @@
 .quick-bet.is-active {
   color: var(--gold-1);
   border-color: var(--gold-1);
-  background: rgba(245, 205, 118, 0.12);
+  background: rgba(230, 181, 76, 0.12);
 }
 
 .slider-row {
@@ -635,17 +641,17 @@
 
 .act-fold {
   color: var(--ink);
-  background: linear-gradient(180deg, #55282c 0 50%, #34181b 50% 100%) padding-box;
+  background: linear-gradient(180deg, #5e2a2e 0 50%, #3a1a1d 50% 100%) padding-box;
 }
 
 .act-call {
   color: #06130c;
-  background: linear-gradient(180deg, #4fd08a 0 50%, #2fa264 50% 100%) padding-box;
+  background: linear-gradient(180deg, #46c383 0 50%, #2b9159 50% 100%) padding-box;
 }
 
 .act-raise {
   color: var(--gold-ink);
-  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%) padding-box;
+  background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%) padding-box;
 }
 
 /* ---------- CRT overlay ---------- */
@@ -684,15 +690,18 @@
 
 @media (max-width: 760px) {
   :root {
+    --px: 2px;
     --avatar-size: clamp(28px, 8vw, 38px);
     --hole-card-w: clamp(22px, 7vw, 34px);
     --hero-card-w: clamp(44px, 13vw, 64px);
     --board-card-w: clamp(38px, 11vw, 56px);
   }
 
+  /* Portrait phones: taller-than-wide oval, aspect override. */
   .table-rail {
     width: 96vw;
     height: 70vh;
+    aspect-ratio: auto;
     border-radius: clamp(90px, 30vw, 200px);
   }
 
@@ -753,7 +762,7 @@
   font-size: 0.56rem;
   line-height: 1.6;
   color: var(--gold-ink);
-  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%) padding-box;
+  background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%) padding-box;
   border: var(--px2) solid transparent;
   border-image: var(--frame-gold) 2;
   padding: 8px 14px;
@@ -777,7 +786,7 @@
   color: var(--ink);
   border: var(--px2) solid transparent;
   border-image: var(--frame-plate) 2;
-  background: rgba(6, 12, 9, 0.92) padding-box;
+  background: rgba(12, 8, 5, 0.92) padding-box;
   border-radius: 0;
   z-index: var(--z-action);
 }
@@ -814,7 +823,7 @@
   font-family: var(--font-pixel);
   font-size: 0.46rem;
   color: var(--gold-ink);
-  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%);
+  background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%);
   border: var(--px) solid var(--outline);
   border-radius: 0;
   box-shadow: 0 var(--px) 0 var(--outline);
@@ -850,7 +859,7 @@
   color: var(--ink);
   border: var(--px3) solid transparent;
   border-image: var(--frame-plate) 2;
-  background: #0b120e padding-box;
+  background: #140d07 padding-box;
   border-radius: 0;
   box-shadow: 0 var(--px3) 0 rgba(0, 0, 0, 0.7);
 }
@@ -934,7 +943,7 @@
 
 .lobby-primary {
   color: var(--gold-ink);
-  background: linear-gradient(180deg, #ffe08a 0 50%, var(--gold-2) 50% 100%);
+  background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%);
   border: var(--px) solid var(--outline);
 }
 
@@ -1005,7 +1014,7 @@
   font-family: var(--font-pixel);
   font-size: 0.42rem;
   color: var(--gold-1);
-  background: rgba(245, 205, 118, 0.14);
+  background: rgba(230, 181, 76, 0.14);
   border: 1px solid var(--gold-2);
   border-radius: 0;
 }
