@@ -258,7 +258,9 @@ export function pokerReducer(state: NetState, message: ServerMessage): NetState 
             seatPosition: seat.position,
             bet: 0,
             lastAction: undefined,
-            holeCards: [],
+            // flush-haus-api sends `game hole` before `game round_start`, so
+            // the hero's cards must survive this reset (opponents stay hidden).
+            holeCards: seat.playerId === state.selfId ? player.holeCards : [],
             status: player.status === 'eliminated' ? 'eliminated' : 'active',
           };
         }
