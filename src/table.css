@@ -31,6 +31,13 @@
   --plate-line: #6b5426;
   --shadow: rgba(0, 0, 0, 0.55);
   --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+  --font-clean: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Press Start 2P is an 8px bitmap grid: render it ONLY at 8px/16px,
+     unsmoothed, or the glyphs scale unevenly and look squished. */
+  --text-pixel: 8px;
+  --text-pixel-lg: 16px;
+  /* Hard two-step drop: crisp contact line plus a deeper offset. */
+  --drop: 0 var(--px2) 0 rgba(0, 0, 0, 0.9), 0 calc(var(--px2) * 2) 0 rgba(0, 0, 0, 0.35);
 
   /* 6×6 pixel frames, border-image-slice 2: dark outer line + light inner
      line with 1-step corners. Pair with:
@@ -75,6 +82,17 @@
   background: radial-gradient(ellipse at 50% 45%, #191009 0 34%, #100a06 34% 62%, #090503 62% 100%);
   isolation: isolate;
   image-rendering: pixelated;
+}
+
+/* Bitmap font renders unsmoothed so glyph pixels stay square. */
+:is(
+  .pot-label, .board-slot-label, .badge, .seat-action, .pod-empty-label,
+  .act, .quick-bet, .hud-btn, .table-banner,
+  .lobby-title, .lobby-primary, .lobby-secondary, .lobby-tag,
+  .lobby-field, .lobby-field-label, .lobby-divider, .lobby-waiting, .lobby-status
+) {
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 /* ---------- Table + rail ---------- */
@@ -196,7 +214,7 @@
 
 .board-slot-label {
   font-family: var(--font-pixel);
-  font-size: 0.42rem;
+  font-size: var(--text-pixel);
   letter-spacing: 0;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.24);
@@ -224,12 +242,12 @@
   border-image: var(--frame-gold) 2;
   background: rgba(12, 8, 5, 0.88) padding-box;
   border-radius: 0;
-  box-shadow: 0 var(--px2) 0 var(--shadow);
+  box-shadow: var(--drop);
 }
 
 .pot-label {
   font-family: var(--font-pixel);
-  font-size: 0.5rem;
+  font-size: var(--text-pixel);
   letter-spacing: 0;
   color: var(--gold-1);
 }
@@ -326,7 +344,7 @@
   border-image: var(--frame-plate) 2;
   background: var(--plate) padding-box;
   border-radius: 0;
-  box-shadow: 0 var(--px2) 0 var(--shadow);
+  box-shadow: var(--drop);
   overflow: visible;
   z-index: var(--z-pod);
 }
@@ -386,7 +404,7 @@
   padding: 0 4px;
   margin-left: auto;
   font-family: var(--font-pixel);
-  font-size: 0.44rem;
+  font-size: var(--text-pixel);
   letter-spacing: 0;
   border: var(--px) solid var(--outline);
   border-radius: 0;
@@ -449,9 +467,9 @@
 
 /* Last-action label */
 .seat-action {
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-family: var(--font-pixel);
-  font-size: 0.46rem;
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
   background: rgba(0, 0, 0, 0.6);
   border: var(--px) solid var(--outline);
@@ -492,7 +510,7 @@
 
 .pod-empty-label {
   font-family: var(--font-pixel);
-  font-size: 0.46rem;
+  font-size: var(--text-pixel);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.32);
 }
@@ -513,7 +531,7 @@
   border-image: var(--frame-plate) 2;
   background: rgba(16, 11, 6, 0.95) padding-box;
   border-radius: 0;
-  box-shadow: 0 var(--px3) 0 var(--shadow);
+  box-shadow: var(--drop);
   z-index: var(--z-action);
 }
 
@@ -532,7 +550,7 @@
   flex: 1;
   padding: 7px 4px;
   font-family: var(--font-pixel);
-  font-size: 0.46rem;
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
   background: rgba(0, 0, 0, 0.35);
   border: var(--px) solid var(--plate-line);
@@ -613,7 +631,7 @@
   gap: 6px;
   padding: 12px 8px;
   font-family: var(--font-pixel);
-  font-size: 0.58rem;
+  font-size: var(--text-pixel);
   color: #0a0a0a;
   border: var(--px2) solid transparent;
   border-image: var(--frame-plate) 2;
@@ -633,8 +651,11 @@
   box-shadow: 0 0 0 var(--outline);
 }
 
+/* Amounts are numbers: clean font per the typography split. */
 .act-sub {
-  font-size: 0.46rem;
+  font-family: var(--font-clean);
+  font-size: 0.74rem;
+  font-weight: 800;
   opacity: 0.85;
   font-variant-numeric: tabular-nums;
 }
@@ -757,13 +778,12 @@
   }
 
   .act {
-    font-size: 0.44rem;
     padding: 10px 4px;
     gap: 4px;
   }
 
   .act-sub {
-    font-size: 0.38rem;
+    font-size: 0.66rem;
   }
 
   .action-buttons {
@@ -771,7 +791,6 @@
   }
 
   .quick-bet {
-    font-size: 0.4rem;
     padding: 6px 2px;
   }
 
@@ -799,7 +818,7 @@
 
 .table-banner {
   font-family: var(--font-pixel);
-  font-size: 0.56rem;
+  font-size: var(--text-pixel);
   line-height: 1.6;
   color: var(--gold-ink);
   background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%) padding-box;
@@ -807,7 +826,7 @@
   border-image: var(--frame-gold) 2;
   padding: 8px 14px;
   border-radius: 0;
-  box-shadow: 0 var(--px2) 0 var(--shadow);
+  box-shadow: var(--drop);
   text-align: center;
   max-width: 60vw;
 }
@@ -861,7 +880,7 @@
 .hud-btn {
   padding: 6px 10px;
   font-family: var(--font-pixel);
-  font-size: 0.46rem;
+  font-size: var(--text-pixel);
   color: var(--gold-ink);
   background: linear-gradient(180deg, #f0cd6f 0 50%, var(--gold-2) 50% 100%);
   border: var(--px) solid var(--outline);
@@ -894,14 +913,14 @@
 }
 
 .lobby-card {
-  width: min(420px, 94vw);
-  padding: 22px;
+  width: min(500px, 94vw);
+  padding: 26px 24px;
   color: var(--ink);
   border: var(--px3) solid transparent;
   border-image: var(--frame-plate) 2;
   background: #140d07 padding-box;
   border-radius: 0;
-  box-shadow: 0 var(--px3) 0 rgba(0, 0, 0, 0.7);
+  box-shadow: 0 var(--px3) 0 #000, 0 calc(var(--px3) * 2) 0 rgba(0, 0, 0, 0.45);
 }
 
 .lobby-head {
@@ -914,13 +933,13 @@
 .lobby-title {
   margin: 0;
   font-family: var(--font-pixel);
-  font-size: 0.82rem;
+  font-size: var(--text-pixel-lg);
   color: var(--gold-1);
 }
 
 .lobby-status {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
 }
 
@@ -951,14 +970,18 @@
 .lobby-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 0.72rem;
+  gap: 6px;
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
+  min-width: 0;
 }
 
 .lobby-field input {
+  width: 100%;
+  min-width: 0;
   padding: 9px 11px;
-  font: inherit;
+  font-family: var(--font-clean);
   font-size: 0.9rem;
   color: var(--ink);
   background: rgba(0, 0, 0, 0.4);
@@ -973,12 +996,12 @@
 
 .lobby-primary,
 .lobby-secondary {
-  padding: 12px;
+  padding: 13px 12px;
   font-family: var(--font-pixel);
-  font-size: 0.55rem;
+  font-size: var(--text-pixel);
   border-radius: 0;
   cursor: pointer;
-  box-shadow: 0 var(--px) 0 var(--outline);
+  box-shadow: 0 var(--px) 0 #000, 0 var(--px2) 0 rgba(0, 0, 0, 0.4);
 }
 
 .lobby-primary {
@@ -1007,7 +1030,8 @@
 
 .lobby-divider {
   text-align: center;
-  font-size: 0.7rem;
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
 }
 
@@ -1025,7 +1049,8 @@
 }
 
 .lobby-field-label {
-  font-size: 0.7rem;
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
   color: var(--ink-muted);
 }
 
@@ -1050,9 +1075,9 @@
 }
 
 .lobby-tag {
-  padding: 2px 6px;
+  padding: 3px 6px;
   font-family: var(--font-pixel);
-  font-size: 0.42rem;
+  font-size: var(--text-pixel);
   color: var(--gold-1);
   background: rgba(230, 181, 76, 0.14);
   border: 1px solid var(--gold-2);
@@ -1067,7 +1092,8 @@
 
 .lobby-waiting {
   margin: 4px 0 0;
-  font-size: 0.8rem;
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
   text-align: center;
   color: var(--ink-muted);
 }
