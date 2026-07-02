@@ -36,8 +36,8 @@
      unsmoothed, or the glyphs scale unevenly and look squished. */
   --text-pixel: 8px;
   --text-pixel-lg: 16px;
-  /* Hard two-step drop: crisp contact line plus a deeper offset. */
-  --drop: 0 var(--px2) 0 rgba(0, 0, 0, 0.9), 0 calc(var(--px2) * 2) 0 rgba(0, 0, 0, 0.35);
+  /* One hard contact shadow; stacked offsets read as detached slabs. */
+  --drop: 0 var(--px2) 0 rgba(0, 0, 0, 0.8);
 
   /* 6×6 pixel frames, border-image-slice 2: dark outer line + light inner
      line with 1-step corners. Pair with:
@@ -506,6 +506,7 @@
     rgba(0, 0, 0, 0.3);
   border: none;
   border-radius: 0;
+  box-shadow: none;
 }
 
 .pod-empty-label {
@@ -920,7 +921,7 @@
   border-image: var(--frame-plate) 2;
   background: #140d07 padding-box;
   border-radius: 0;
-  box-shadow: 0 var(--px3) 0 #000, 0 calc(var(--px3) * 2) 0 rgba(0, 0, 0, 0.45);
+  box-shadow: 0 var(--px3) 0 rgba(0, 0, 0, 0.8);
 }
 
 .lobby-head {
@@ -1001,7 +1002,7 @@
   font-size: var(--text-pixel);
   border-radius: 0;
   cursor: pointer;
-  box-shadow: 0 var(--px) 0 #000, 0 var(--px2) 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 var(--px) 0 var(--outline);
 }
 
 .lobby-primary {
