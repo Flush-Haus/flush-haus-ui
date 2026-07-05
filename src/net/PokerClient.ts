@@ -40,20 +40,45 @@ function parseLine(line: string): ServerMessage | null {
   };
 }
 
+// A dropped socket that was previously live is retried a few times with
+// exponential backoff before giving up; an initial connection that never
+// succeeds (server offline) fails fast so the lobby can say so.
+const MAX_RECONNECTS = 5;
+const RECONNECT_BASE_MS = 1000;
+const RECONNECT_MAX_MS = 15_000;
+
 export class PokerClient {
   private ws: WebSocket | null = null;
   private readonly url: string;
   private readonly handlers: PokerClientHandlers;
   private pingTimer: number | null = null;
+  private reconnectTimer: number | null = null;
   private closedByUser = false;
+  private wasConnected = false;
+  private reconnectAttempts = 0;
+  // When set (once the player has an id), a re-opened socket re-binds to the
+  // existing player via `session reconnect` — see PROTOCOLO.md §2.1.
+  private resumeCommand: string | null = null;
 
   constructor(url: string, handlers: PokerClientHandlers) {
     this.url = url;
     this.handlers = handlers;
   }
 
+  /** Lets the app resume its server-side player after an unexpected drop. */
+  setResumeCommand(command: string | null) {
+    this.resumeCommand = command;
+  }
+
   connect() {
     this.closedByUser = false;
+    this.wasConnected = false;
+    this.reconnectAttempts = 0;
+    this.open();
+  }
+
+  private open() {
+    this.clearReconnect();
     this.handlers.onStatus('connecting');
 
     try {
@@ -64,7 +89,12 @@ export class PokerClient {
     }
 
     this.ws.onopen = () => {
+      this.wasConnected = true;
+      this.reconnectAttempts = 0;
       this.handlers.onStatus('connected');
+      if (this.resumeCommand) {
+        this.send(this.resumeCommand);
+      }
       this.startHeartbeat();
     };
 
@@ -79,17 +109,42 @@ export class PokerClient {
     };
 
     this.ws.onerror = () => {
-      this.handlers.onStatus('error');
+      // onclose always follows; let it decide whether to retry.
     };
 
     this.ws.onclose = () => {
       this.stopHeartbeat();
-      this.handlers.onStatus(this.closedByUser ? 'disconnected' : 'error');
+      if (this.closedByUser) {
+        this.handlers.onStatus('disconnected');
+        return;
+      }
+      // Only retry a socket that had actually connected; a failed first attempt
+      // means the server is unreachable, so surface the error immediately.
+      if (this.wasConnected && this.reconnectAttempts < MAX_RECONNECTS) {
+        this.scheduleReconnect();
+      } else {
+        this.handlers.onStatus('error');
+      }
     };
+  }
+
+  private scheduleReconnect() {
+    const delay = Math.min(RECONNECT_BASE_MS * 2 ** this.reconnectAttempts, RECONNECT_MAX_MS);
+    this.reconnectAttempts += 1;
+    this.handlers.onStatus('connecting');
+    this.reconnectTimer = window.setTimeout(() => this.open(), delay);
+  }
+
+  private clearReconnect() {
+    if (this.reconnectTimer !== null) {
+      window.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
   }
 
   disconnect() {
     this.closedByUser = true;
+    this.clearReconnect();
     this.stopHeartbeat();
     this.ws?.close();
     this.ws = null;

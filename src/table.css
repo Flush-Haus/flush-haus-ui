@@ -696,14 +696,16 @@
   border-radius: 0;
 }
 
-/* The dealer's shoe: a small stack of backs on the felt. */
+/* The dealer's shoe: the deck the cards fly from. Parked at top-center on open
+   felt, above the result banner, and painted BENEATH the board/pot/banner
+   (z-felt) so it can never occlude live game state. */
 .table-deck {
   position: absolute;
-  left: 38%;
-  top: 24%;
-  width: calc(var(--board-card-w) * 0.62);
-  transform: rotate(4deg);
-  z-index: var(--z-board);
+  left: 50%;
+  top: 15%;
+  width: calc(var(--board-card-w) * 0.6);
+  transform: translateX(-50%) rotate(-4deg);
+  z-index: var(--z-felt);
   pointer-events: none;
 }
 
@@ -768,8 +770,9 @@
   }
 
   .pod {
-    min-width: clamp(78px, 26vw, 120px);
-    padding: 4px 8px 4px 5px;
+    min-width: clamp(68px, 21vw, 102px);
+    max-width: 43vw;
+    padding: 4px 7px 4px 5px;
     gap: 6px;
   }
 
@@ -1097,4 +1100,76 @@
   font-size: var(--text-pixel);
   text-align: center;
   color: var(--ink-muted);
+}
+
+/* Helper line under the connect button when the server can't be reached. */
+.lobby-hint {
+  margin: 2px 0 0;
+  font-family: var(--font-clean);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.lobby-hint code,
+.lobby-net code {
+  padding: 1px 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+  color: var(--gold-1);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--plate-line);
+}
+
+/* Educational "how this maps to TCP" disclosure. */
+.lobby-net {
+  margin-top: 16px;
+  border-top: var(--px) solid var(--plate-line);
+  padding-top: 12px;
+}
+
+.lobby-net summary {
+  font-family: var(--font-pixel);
+  font-size: var(--text-pixel);
+  color: var(--gold-1);
+  cursor: pointer;
+  list-style: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.lobby-net summary::-webkit-details-marker {
+  display: none;
+}
+
+.lobby-net summary::before {
+  content: '▸ ';
+}
+
+.lobby-net[open] summary::before {
+  content: '▾ ';
+}
+
+.lobby-net summary:hover {
+  color: var(--ink);
+}
+
+.lobby-net-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lobby-net-body p {
+  margin: 0;
+  font-family: var(--font-clean);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(246, 238, 217, 0.82);
+  text-wrap: pretty;
+}
+
+.lobby-net-body strong {
+  color: var(--ink);
 }

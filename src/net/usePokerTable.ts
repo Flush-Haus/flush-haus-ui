@@ -48,6 +48,12 @@ export function usePokerTable(): PokerConnection {
     return () => clientRef.current?.disconnect();
   }, []);
 
+  // Once we know our player id, an auto-reconnect can re-bind to it instead of
+  // starting over (PROTOCOLO.md `session reconnect`).
+  useEffect(() => {
+    clientRef.current?.setResumeCommand(net.selfId ? `session reconnect ${net.selfId}` : null);
+  }, [net.selfId]);
+
   const connect = useCallback((url: string = DEFAULT_WS_URL) => {
     clientRef.current?.disconnect();
     const client = new PokerClient(url, {

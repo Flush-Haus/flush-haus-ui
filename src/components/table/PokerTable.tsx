@@ -1,8 +1,9 @@
 import { useMemo, useRef } from 'react';
 import useCardAssets from '../../hooks/useCardAssets';
+import useMediaQuery from '../../hooks/useMediaQuery';
 import type { TableModel } from '../../types/poker';
 import FlyingCard from '../FlyingCard';
-import { SEAT_ANCHORS } from './seatLayout';
+import { PORTRAIT_SEAT_ANCHORS, SEAT_ANCHORS } from './seatLayout';
 import Seat from './Seat';
 import CommunityBoard from './CommunityBoard';
 import Pot from './Pot';
@@ -18,6 +19,8 @@ interface PokerTableProps {
 export default function PokerTable({ table, actions, banner }: PokerTableProps) {
   const { cards, backCard } = useCardAssets();
   const roomRef = useRef<HTMLElement>(null);
+  const isPortrait = useMediaQuery('(max-width: 760px)');
+  const anchors = isPortrait ? PORTRAIT_SEAT_ANCHORS : SEAT_ANCHORS;
 
   const getCardUrl = useMemo(() => {
     const map = new Map(cards.map((card) => [card.id, card.url]));
@@ -49,7 +52,7 @@ export default function PokerTable({ table, actions, banner }: PokerTableProps) 
           ) : null}
         </div>
 
-        {SEAT_ANCHORS.map((anchor, index) => (
+        {anchors.map((anchor, index) => (
           <Seat
             key={index}
             anchor={anchor}
