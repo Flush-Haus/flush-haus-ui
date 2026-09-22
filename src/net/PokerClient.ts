@@ -59,6 +59,10 @@ export class PokerClient {
   // When set (once the player has an id), a re-opened socket re-binds to the
   // existing player via `session reconnect` — see PROTOCOLO.md §2.1.
   private resumeCommand: string | null = null;
+  // Last inbound frame time. Proxies and tunnels can die half-open (outbound
+  // frames leave, nothing arrives); silence beyond the limit forces a
+  // reconnect so the session resumes instead of stalling forever.
+  private lastInboundAt = 0;
 
   constructor(url: string, handlers: PokerClientHandlers) {
     this.url = url;
@@ -91,6 +95,7 @@ export class PokerClient {
     this.ws.onopen = () => {
       this.wasConnected = true;
       this.reconnectAttempts = 0;
+      this.lastInboundAt = Date.now();
       this.handlers.onStatus('connected');
       if (this.resumeCommand) {
         this.send(this.resumeCommand);
@@ -100,6 +105,7 @@ export class PokerClient {
 
     this.ws.onmessage = (event) => {
       const data = typeof event.data === 'string' ? event.data : '';
+      this.lastInboundAt = Date.now();
       for (const line of data.split('\n')) {
         const message = parseLine(line);
         if (message) {
@@ -153,6 +159,21 @@ export class PokerClient {
   private startHeartbeat() {
     this.stopHeartbeat();
     this.pingTimer = window.setInterval(() => {
+      // Half-open detection: pings only prove the uplink. If nothing at
+      // all arrived recently, the downlink is dead — recycle the socket so
+      // `session reconnect` restores the session instead of stalling.
+      if (
+        this.ws &&
+        this.ws.readyState === WebSocket.OPEN &&
+        Date.now() - this.lastInboundAt > 35000
+      ) {
+        try {
+          this.ws.close();
+        } catch {
+          // onclose drives the reconnect below
+        }
+        return;
+      }
       this.send(`session ping ${Date.now()}`);
     }, 15000);
   }

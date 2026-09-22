@@ -22,6 +22,12 @@ function defaultWsUrl(): string {
 
 export const DEFAULT_WS_URL = defaultWsUrl();
 
+// Production marker: VITE_POKER_SERVER_URL is set only in the production
+// build, where the normal flow auto-connects (no manual URL step).
+export const AUTO_CONNECT = Boolean(
+  (import.meta.env.VITE_POKER_SERVER_URL as string | undefined)?.trim()
+);
+
 export interface PokerActions {
   connect: (url?: string) => void;
   disconnect: () => void;
@@ -79,6 +85,16 @@ export function usePokerTable(): PokerConnection {
     clientRef.current = client;
     client.connect();
   }, []);
+
+  // Production auto-connect: exactly once on mount, using the configured
+  // production backend. Manual connect/disconnect still work afterwards.
+  const autoDone = useRef(false);
+  useEffect(() => {
+    if (AUTO_CONNECT && !autoDone.current) {
+      autoDone.current = true;
+      connect();
+    }
+  }, [connect]);
 
   const actions = useMemo<PokerActions>(
     () => ({

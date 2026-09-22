@@ -39,10 +39,29 @@ function errorMessage(code: string): string {
   return ERROR_LABEL[code] ?? code;
 }
 
+function initialJoinId(): string {
+  try {
+    return new URLSearchParams(window.location.search).get('room') ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function roomLink(sessionId: string): string {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('room', sessionId);
+    return url.toString();
+  } catch {
+    return sessionId;
+  }
+}
+
 export default function Lobby({ status, net, isOwner, actions }: LobbyProps) {
   const [url, setUrl] = useState(DEFAULT_WS_URL);
   const [name, setName] = useState('');
-  const [joinId, setJoinId] = useState('');
+  const [joinId, setJoinId] = useState(initialJoinId);
+  const [copied, setCopied] = useState(false);
   const [smallBlind, setSmallBlind] = useState(5);
   const [bigBlind, setBigBlind] = useState(10);
   const [startingChips, setStartingChips] = useState(1000);
@@ -55,6 +74,21 @@ export default function Lobby({ status, net, isOwner, actions }: LobbyProps) {
   const connected = status === 'connected';
   const inSession = Boolean(net.sessionId);
   const players = net.joinOrder.map((id) => net.players[id]).filter(Boolean);
+
+  async function copyInvite(): Promise<void> {
+    if (!net.sessionId) {
+      return;
+    }
+    const link = roomLink(net.sessionId);
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      window.prompt('Copie o convite:', link);
+      return;
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
 
   return (
     <div className="lobby-overlay">
@@ -127,6 +161,9 @@ export default function Lobby({ status, net, isOwner, actions }: LobbyProps) {
             <div className="lobby-session-id">
               <span className="lobby-field-label">ID da sessão</span>
               <code>{net.sessionId}</code>
+              <button type="button" className="lobby-secondary" onClick={() => void copyInvite()}>
+                {copied ? 'Copiado!' : 'Copiar convite'}
+              </button>
             </div>
 
             <ul className="lobby-players">
