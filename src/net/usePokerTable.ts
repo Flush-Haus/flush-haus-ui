@@ -4,7 +4,23 @@ import { PokerClient, type ClientStatus } from './PokerClient';
 import { initialNetState, pokerReducer, selectTableModel, type NetState } from './pokerReducer';
 
 // flush-haus-api defaults to PORT=8080 (src/utils/env.ts).
-export const DEFAULT_WS_URL = 'ws://localhost:8080/ws';
+// The default WebSocket target follows the page itself so a browser opened
+// from another machine on the LAN reaches the right host without typing an
+// IP: page on localhost -> localhost:8080/ws, page on 192.168.x.x ->
+// 192.168.x.x:8080/ws. VITE_POKER_SERVER_URL wins when set.
+function defaultWsUrl(): string {
+  const override = (import.meta.env.VITE_POKER_SERVER_URL as string | undefined)?.trim();
+  if (override) {
+    return override;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${scheme}://${window.location.hostname}:8080/ws`;
+  }
+  return 'ws://localhost:8080/ws';
+}
+
+export const DEFAULT_WS_URL = defaultWsUrl();
 
 export interface PokerActions {
   connect: (url?: string) => void;

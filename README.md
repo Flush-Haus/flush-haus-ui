@@ -57,9 +57,12 @@ bun run src/index.ts        # ou: bun run dev  (watch)
 npm run dev                 # Vite em http://localhost:5173
 ```
 
-Abra `http://localhost:5173`, confirme a URL `ws://localhost:8080/ws` no lobby e
-clique **Conectar**. A URL do WebSocket é editável no lobby, então dá para apontar
-para outra máquina na LAN (`ws://<ip>:8080/ws`).
+Abra `http://localhost:5173`, confirme a URL do WebSocket no lobby e clique
+**Conectar**. A URL é preenchida automaticamente a partir do endereço da
+página — se você abriu `http://192.168.x.x:5173` de outro PC, ela já aponta
+para `ws://192.168.x.x:8080/ws` sem digitar nada. Ela continua editável no
+lobby para casos especiais, e `VITE_POKER_SERVER_URL` (build/dev) tem
+prioridade quando definida.
 
 ### Modo demonstração (sem servidor)
 
@@ -73,16 +76,18 @@ para agir, oponente que apostou, all-in, folds, dealer + blinds, assento vazio).
 
 ## Como testar o fluxo WebSocket / jogo
 
-- **Solo (rápido):** Conectar → *Criar sessão* → *Iniciar partida*. O dono envia
-  `game ready` automaticamente e a mão é distribuída; dá para percorrer as ruas.
+- **Solo (rápido):** Conectar → *Criar sessão* → *Iniciar partida*. Cada
+  cliente envia `game ready` automaticamente e a mão é distribuída quando
+  todos estiverem prontos; dá para percorrer as ruas.
 - **Dois jogadores:** abra duas abas. Na aba A, *Criar sessão* e copie o **ID da
   sessão** exibido. Na aba B, cole o ID em *Entrar na sessão* e informe um nome.
   Volte à aba A e *Iniciar partida*.
 - **Servidor offline:** pare a API e clique *Conectar* — o lobby mostra
   "Falha na conexão" com a dica de verificar se o `flush-haus-api` está rodando.
 - **Reconexão:** derrube a API no meio de uma sessão e suba de novo; o cliente
-  reconecta com backoff exponencial e tenta re-vincular o jogador
-  (`session reconnect`).
+  reconecta com backoff exponencial, re-vincula o jogador
+  (`session reconnect`) e o servidor reenvia o snapshot autoritativo
+  (mesa, pote, board, suas cartas, turno atual).
 
 ## Limitações conhecidas
 
@@ -94,9 +99,10 @@ para agir, oponente que apostou, all-in, folds, dealer + blinds, assento vazio).
 - **Layout em retrato (celular)** é um ajuste "melhor esforço" para 9 lugares numa
   tela estreita — assentos que desistiram nas laterais podem encostar levemente
   nas cartas comunitárias.
-- **Sem persistência**: recarregar a aba perde o estado local (a reconexão tenta
-  restaurar a sessão pelo `playerId`, mas o estado completo da mão não é reenviado
-  pelo servidor).
+- **Sem persistência**: recarregar a aba perde o estado local; a reconexão
+  restaura a sessão pelo `playerId` com o snapshot que o servidor reenvia.
+  Jogadores que entram no meio de uma mão assistem como espera e jogam a
+  próxima.
 
 ## Relação com o trabalho de TCP
 

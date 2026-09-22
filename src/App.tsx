@@ -23,19 +23,20 @@ const demoActions: ActionBarActions = {
 // motion primitives are the next layer to graft onto these live state transitions.
 export default function App() {
   const { status, net, table, isOwner, actions } = usePokerTable();
-  const dealtRef = useRef(false);
+  // Auto-ready: the server aggregates `game ready` from every participant and
+  // deals exactly once when all are ready (duplicate readies are idempotent),
+  // so every client sends ready once per hand — no owner-only workaround.
+  const readySentRef = useRef(false);
 
-  // The server deals a round on the first `game ready`; only the owner sends it
-  // (this server has no ready aggregation, so multiple readies would re-deal).
   useEffect(() => {
-    if (net.sessionState === 'running' && isOwner && !dealtRef.current) {
-      dealtRef.current = true;
+    if (net.sessionState === 'running' && !net.handInProgress && !readySentRef.current) {
+      readySentRef.current = true;
       actions.ready();
     }
-    if (net.sessionState !== 'running') {
-      dealtRef.current = false;
+    if (net.handInProgress) {
+      readySentRef.current = false;
     }
-  }, [net.sessionState, isOwner, actions]);
+  }, [net.sessionState, net.handInProgress, actions]);
 
   const showNextHand = net.sessionState === 'running' && !net.handInProgress && isOwner;
 

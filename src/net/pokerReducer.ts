@@ -195,7 +195,12 @@ export function pokerReducer(state: NetState, message: ServerMessage): NetState 
           joinOrder,
           sessionId: sessionId ?? state.sessionId,
           ownerId: ownerId ?? state.ownerId,
-          sessionState: sessionState === 'running' ? 'running' : 'lobby',
+          sessionState:
+            sessionState === 'running'
+              ? 'running'
+              : sessionState === 'closed'
+                ? 'closed'
+                : 'lobby',
         };
       }
       case 'player_joined': {
@@ -212,6 +217,23 @@ export function pokerReducer(state: NetState, message: ServerMessage): NetState 
         delete players[playerId];
         return { ...state, players, joinOrder: state.joinOrder.filter((id) => id !== playerId) };
       }
+      case 'player_banned': {
+        const [playerId] = params;
+        delete players[playerId];
+        return {
+          ...state,
+          players,
+          joinOrder: state.joinOrder.filter((id) => id !== playerId),
+          banner: 'Jogador banido da sessão',
+        };
+      }
+      case 'player_unbanned': {
+        // The unbanned player rejoins with a fresh id; nothing to merge.
+        return { ...state, banner: undefined };
+      }
+      case 'waiting_round_end': {
+        return { ...state, banner: 'Aguarde o fim da mão atual para entrar' };
+      }
       case 'started': {
         const [sb, bb, startingChips] = params;
         const chips = Number(startingChips);
@@ -227,8 +249,14 @@ export function pokerReducer(state: NetState, message: ServerMessage): NetState 
           bigBlindAmount: Number(bb),
         };
       }
-      case 'closed':
-        return { ...state, sessionState: 'closed' };
+      case 'closed': {
+        const [reason] = params;
+        return {
+          ...state,
+          sessionState: 'closed',
+          banner: reason === 'banned' ? 'Você foi removido da sessão' : state.banner,
+        };
+      }
       default:
         return state;
     }
