@@ -2,3 +2,6 @@ node_modules
 dist
 *.tsbuildinfo
 *.log
+
+# Vercel CLI link state (project/org ids, never source)
+.vercel
